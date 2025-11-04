@@ -169,7 +169,7 @@ Your goal is to comfort the user, ensure safety, and guide them to real human he
 
 crisis_agent = create_react_agent(
     model=model,
-    tools=[]
+    tools=[],
     prompt=crisis_system_prompt,
     name="crisis_agent"
 )
