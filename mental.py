@@ -39,7 +39,7 @@ def create_supervisor(agents, model, prompt, add_handoff_back_messages=False, ou
     )
 
     # Define a simple graph
-    graph = StateGraph()
+    graph = StateGraph(AgentState)
 
     # Add supervisor and sub-agents
     graph.add_node("supervisor", supervisor_agent)
