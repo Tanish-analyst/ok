@@ -21,7 +21,6 @@ model = ChatGroq(model="llama-3.3-70b-versatile", api_key=os.getenv("GROQ_API_KE
 # -------------------------------
 
 from langgraph.graph import StateGraph, END
-
 def create_supervisor(agents, model, prompt, add_handoff_back_messages=False, output_mode="last_message"):
     """
     Creates a supervisor agent that delegates user messages to sub-agents.
@@ -29,6 +28,13 @@ def create_supervisor(agents, model, prompt, add_handoff_back_messages=False, ou
     import langchain_core
     from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
     from langgraph.prebuilt import create_react_agent
+    from langgraph.graph import StateGraph, END
+    from langgraph.graph.schema import BaseState
+    from typing import List, Any
+
+    # Define the state schema (fix)
+    class SupervisorState(BaseState):
+        messages: List[Any]
 
     # Create the supervisor agent
     supervisor_agent = create_react_agent(
@@ -38,8 +44,8 @@ def create_supervisor(agents, model, prompt, add_handoff_back_messages=False, ou
         name="supervisor"
     )
 
-    # Define a simple graph
-    graph = StateGraph(AgentState)
+    # Define the graph with schema
+    graph = StateGraph(SupervisorState)
 
     # Add supervisor and sub-agents
     graph.add_node("supervisor", supervisor_agent)
