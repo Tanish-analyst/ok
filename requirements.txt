@@ -1,5 +1,5 @@
 streamlit
 langchain-core
-langgraph
+langgraph>=0.2.3
 langchain-groq
 ipython
