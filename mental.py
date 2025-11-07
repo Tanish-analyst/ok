@@ -1,69 +1,96 @@
 import streamlit as st
-from langchain_core.messages import HumanMessage
-from typing import List, Dict
+from langchain_core.messages import HumanMessage, AIMessage
+from typing import List, Dict, Any, Annotated
 from langgraph.prebuilt import create_react_agent
 from langchain_groq import ChatGroq
-from IPython.display import Image, display
 from langchain_core.messages import HumanMessage, SystemMessage
 import os
-from langchain_core.tools import tool
-#from googleapiclient.discovery import build
-#from google.oauth2.credentials import Credentials
+from langgraph.graph import StateGraph, END, START
+from langgraph.graph.message import add_messages
+from typing_extensions import TypedDict
 
+# Set environment variables
 os.environ["GROQ_API_KEY"] = "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"
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGSMITH_PROJECT"] = "ff10"
 os.environ["LANGSMITH_API_KEY"] = "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"
 
+# Initialize model
 model = ChatGroq(model="llama-3.3-70b-versatile", api_key=os.getenv("GROQ_API_KEY"))
-# -------------------------------
-# Add this before you use create_supervisor
-# -------------------------------
 
-from langgraph.graph import StateGraph, END
-def create_supervisor(agents, model, prompt, add_handoff_back_messages=False, output_mode="last_message"):
+# Define state schema properly
+class AgentState(TypedDict):
+    messages: Annotated[list, add_messages]
+
+def create_supervisor(agents, model, prompt):
     """
     Creates a supervisor agent that delegates user messages to sub-agents.
     """
-    import langchain_core
-    from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-    from langgraph.prebuilt import create_react_agent
-    from langgraph.graph import StateGraph, END
-    from langgraph.graph.schema import BaseState
-    from typing import List, Any
-
-    # Define the state schema (fix)
-    class SupervisorState(BaseState):
-        messages: List[Any]
-
-    # Create the supervisor agent
-    supervisor_agent = create_react_agent(
-        model=model,
-        tools=[],
-        prompt=prompt,
-        name="supervisor"
+    # Create the graph with proper state
+    workflow = StateGraph(AgentState)
+    
+    # Supervisor node function
+    def supervisor_node(state: AgentState):
+        messages = state["messages"]
+        last_message = messages[-1].content if messages else ""
+        
+        # Route based on keywords
+        lower_msg = last_message.lower()
+        
+        # Crisis detection (highest priority)
+        crisis_keywords = ["die", "suicide", "end it", "kill myself", "no point", "can't take this"]
+        if any(keyword in lower_msg for keyword in crisis_keywords):
+            return {"next": "crisis_agent"}
+        
+        # Stress/anxiety detection
+        stress_keywords = ["stress", "anxious", "anxiety", "exam", "pressure", "overwhelm", "overthinking"]
+        if any(keyword in lower_msg for keyword in stress_keywords):
+            return {"next": "therapist_agent"}
+        
+        # Motivation detection
+        motivation_keywords = ["fail", "motivation", "lazy", "tired", "can't do", "useless", "give up"]
+        if any(keyword in lower_msg for keyword in motivation_keywords):
+            return {"next": "motivational_agent"}
+        
+        # Default to voice companion
+        return {"next": "voice_companion_agent"}
+    
+    # Add supervisor node
+    workflow.add_node("supervisor", supervisor_node)
+    
+    # Add agent nodes
+    for agent in agents:
+        workflow.add_node(agent.name, agent)
+    
+    # Add conditional edges from supervisor to agents
+    def route_to_agent(state: AgentState) -> str:
+        # Get the routing decision from supervisor
+        supervisor_result = supervisor_node(state)
+        return supervisor_result["next"]
+    
+    workflow.add_conditional_edges(
+        "supervisor",
+        route_to_agent,
+        {
+            "voice_companion_agent": "voice_companion_agent",
+            "therapist_agent": "therapist_agent",
+            "motivational_agent": "motivational_agent",
+            "crisis_agent": "crisis_agent"
+        }
     )
-
-    # Define the graph with schema
-    graph = StateGraph(SupervisorState)
-
-    # Add supervisor and sub-agents
-    graph.add_node("supervisor", supervisor_agent)
+    
+    # All agents end after responding
     for agent in agents:
-        graph.add_node(agent.name, agent)
+        workflow.add_edge(agent.name, END)
+    
+    # Set entry point
+    workflow.set_entry_point("supervisor")
+    
+    return workflow
 
-    # Route messages (simplified)
-    for agent in agents:
-        graph.add_edge("supervisor", agent.name)
-        graph.add_edge(agent.name, END)
-
-    graph.set_entry_point("supervisor")
-    return graph
-
-
-
+# Voice Companion Agent
 voice_companion_prompt = """
-You are the AI  Companion — a warm, friendly, and non-judgmental friend.
+You are the AI Companion — a warm, friendly, and non-judgmental friend.
 Your purpose is to make users feel heard, supported, and less lonely.
 
 Behavior guidelines:
@@ -83,10 +110,11 @@ Your mission:
 voice_companion_agent = create_react_agent(
     model=model,
     tools=[],
-    prompt=voice_companion_prompt,
-    name="voice_companion_agent"
+    state_schema=AgentState,
+    messages_modifier=voice_companion_prompt
 )
 
+# Therapist Agent
 therapist_system_prompt = """
 You are the AI Therapist-like Assistant.
 
@@ -104,7 +132,7 @@ Tone:
 
 Core principles:
 - Listen first, then gently help the user regulate emotions.
-- Focus on emotional validation: “It’s okay to feel that way.”
+- Focus on emotional validation: "It's okay to feel that way."
 - Encourage reflection and healthy habits (study breaks, journaling, rest).
 - Keep the conversation safe, confidential, and kind.
 """
@@ -112,9 +140,11 @@ Core principles:
 therapist_agent = create_react_agent(
     model=model,
     tools=[],
-    prompt=therapist_system_prompt,
-    name="therapist_agent"
+    state_schema=AgentState,
+    messages_modifier=therapist_system_prompt
 )
+
+# Motivational Agent
 motivational_system_prompt = """
 You are the Motivational Coach Agent — an energetic, positive, and supportive guide.
 
@@ -130,7 +160,7 @@ Tone:
 - Always end responses on a hopeful or action-oriented note.
 
 Guidelines:
-- Validate effort before giving advice (“You’re trying, and that matters.”).
+- Validate effort before giving advice ("You're trying, and that matters.").
 - Remind users that failure is feedback.
 - Focus on growth mindset: small steps → big progress.
 - Avoid judgment or comparison.
@@ -140,10 +170,11 @@ Guidelines:
 motivational_agent = create_react_agent(
     model=model,
     tools=[],
-    prompt=motivational_system_prompt,
-    name="motivational_agent"
+    state_schema=AgentState,
+    messages_modifier=motivational_system_prompt
 )
 
+# Crisis Agent
 crisis_system_prompt = """
 You are the Crisis Detection & Safe Handoff Agent for youth mental wellness.
 
@@ -152,6 +183,7 @@ You are the Crisis Detection & Safe Handoff Agent for youth mental wellness.
 - Always respond with warmth, compassion, and empathy.
 - Provide trusted Indian 24x7 helpline contacts when appropriate.
 - Encourage the user to talk to someone they trust or call a helpline immediately.
+
 📞 Always include Indian helplines when distress is high:
    - AASRA: 91-9820466726
    - Vandrevala Foundation: 1860 2662 345
@@ -164,7 +196,6 @@ You are the Crisis Detection & Safe Handoff Agent for youth mental wellness.
 - Short sentences (2–4 lines).
 - Acknowledge the pain before offering any advice.
 
-
 🚫 Do NOT:
 - Say that you are sending an email.
 - Reveal any internal system or tool names.
@@ -176,50 +207,16 @@ Your goal is to comfort the user, ensure safety, and guide them to real human he
 crisis_agent = create_react_agent(
     model=model,
     tools=[],
-    prompt=crisis_system_prompt,
-    name="crisis_agent"
+    state_schema=AgentState,
+    messages_modifier=crisis_system_prompt
 )
 
+# Supervisor system message
 supervisor_system_message = """
-You are the Supervisor Agent.
-
-Your job:
-- Read the user's message carefully.
-- Decide which emotional AI sub-agent should handle it.
-- You do NOT answer directly — only delegate to the right agent.
-
-Available Agents:
-1. Voice Companion Agent
-   - Handles loneliness, boredom, casual chat, small talk, or mild sadness.
-   - Keywords: lonely, bored, alone, nobody, talk, friend, chill, random.
-   - Example: "I feel lonely today." → voice_companion_agent
-
-2. Therapist-like Agent
-   - Handles stress, anxiety, exam pressure, overthinking, family or peer pressure.
-   - Keywords: anxious, stress, pressure, focus, exams, can't study, overthinking.
-   - Example: "I’m stressed about my exams." → therapist_agent
-
-3. Motivational Coach Agent
-   - Handles low motivation, self-doubt, or failure recovery.
-   - Keywords: fail, no motivation, lazy, tired, can't do it, lost hope, give up (non-suicidal).
-   - Example: "I failed again, I feel useless." → motivational_agent
-
-4. Crisis Detection & Safe Handoff Agent
-   - Handles severe emotional distress or suicidal thoughts.
-   - Keywords: want to die, end it, no point in living, can't take this anymore, hopeless, suicide.
-   - Example: "I want to end it all." → crisis_agent
-
-Rules:
-- Always pick exactly one agent per user message.
-- If any suicide- or death-related intent appears → immediately choose the Crisis Agent.
-- If user is just sad or wants someone to talk → choose the Voice Companion Agent.
-- If it’s about motivation, failure, or confidence → choose Motivational Coach Agent.
-- If it’s anxiety, exam stress, or emotional overwhelm → choose Therapist-like Agent.
-- Never respond directly; only route to a sub-agent.
-- Do not mix multiple agents at once.
-- Keep routing logic safe and emotionally appropriate.
+You are the Supervisor Agent that routes messages to the appropriate sub-agent.
 """
 
+# Create and compile supervisor
 supervisor = create_supervisor(
     agents=[
         voice_companion_agent,
@@ -228,11 +225,10 @@ supervisor = create_supervisor(
         crisis_agent
     ],
     model=model,
-    prompt=supervisor_system_message,
-    add_handoff_back_messages=False,
-    output_mode="last_message"
+    prompt=supervisor_system_message
 ).compile()
-            
+
+# Streamlit UI
 st.set_page_config(
     page_title="Youth Mental Wellness AI",
     page_icon="💙",
@@ -277,24 +273,27 @@ if prompt := st.chat_input("Share what's on your mind..."):
             st.session_state.conversation_history.append(HumanMessage(content=prompt))
             
             # Get response from supervisor
-            response = supervisor.invoke({"messages": st.session_state.conversation_history})
-            st.session_state.conversation_history = response['messages']
-            
-            # Extract final agent response
-            ai_response = None
-            for msg in reversed(response['messages']):
-                if (msg.type == 'ai' and 
-                    hasattr(msg, 'name') and 
-                    msg.name != 'supervisor' and
-                    not getattr(msg, 'tool_calls', None)):
-                    ai_response = msg.content
-                    break
-            
-            if ai_response:
-                st.markdown(ai_response)
-                st.session_state.messages.append({"role": "assistant", "content": ai_response})
-            else:
-                st.error("Sorry, I couldn't generate a response. Please try again.")
+            try:
+                response = supervisor.invoke({"messages": st.session_state.conversation_history})
+                st.session_state.conversation_history = response['messages']
+                
+                # Extract final agent response
+                ai_response = None
+                for msg in reversed(response['messages']):
+                    if hasattr(msg, 'content') and isinstance(msg.content, str) and msg.content.strip():
+                        if msg.type == 'ai':
+                            ai_response = msg.content
+                            break
+                
+                if ai_response:
+                    st.markdown(ai_response)
+                    st.session_state.messages.append({"role": "assistant", "content": ai_response})
+                else:
+                    fallback = "I'm here for you. How are you feeling today?"
+                    st.markdown(fallback)
+                    st.session_state.messages.append({"role": "assistant", "content": fallback})
+            except Exception as e:
+                st.error(f"Sorry, I encountered an error: {str(e)}")
 
 # Sidebar with info
 with st.sidebar:
