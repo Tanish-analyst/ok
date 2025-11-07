@@ -1,5 +1,5 @@
-streamlit
-langchain-core
-langgraph>=0.2.3
-langchain-groq
-ipython
+streamlit==1.31.0
+langchain-core==0.3.28
+langchain-groq==0.2.1
+langgraph==0.2.60
+typing-extensions==4.12.2
