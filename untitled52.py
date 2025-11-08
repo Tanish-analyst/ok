@@ -9,14 +9,13 @@ from langchain_core.tools import tool
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 
-# Set environment variables
-os.environ["GROQ_API_KEY"] = "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"
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGSMITH_PROJECT"] = "ff10"
-os.environ["LANGSMITH_API_KEY"] = "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"
+groq_api_key = st.secrets["GROQ_API_KEY"]
+langchain_tracing = st.secrets["LANGCHAIN_TRACING_V2"]
+langsmith_project = st.secrets["LANGSMITH_PROJECT"]
+langsmith_api_key = st.secrets["LANGSMITH_API_KEY"]
 
 # Initialize model
-model = ChatGroq(model="llama-3.3-70b-versatile", api_key=os.getenv("GROQ_API_KEY"))
+model = ChatGroq(model="llama-3.3-70b-versatile", api_key=os.getenv("groq_api_key"))
 
 # Gmail helper functions
 def get_credentials():
