@@ -1,5 +1,9 @@
-streamlit==1.31.0
-langchain-core==0.3.28
-langchain-groq==0.2.1
-langgraph==0.2.60
-typing-extensions==4.12.2
+streamlit
+langchain
+langgraph
+langgraph-supervisor==0.0.30
+langchain_groq
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
