@@ -18,17 +18,23 @@ langsmith_api_key = st.secrets["LANGSMITH_API_KEY"]
 model = ChatGroq(model="llama-3.3-70b-versatile", api_key=os.getenv("groq_api_key"))
 
 # Gmail helper functions
+
 def get_credentials():
-    """Load Gmail API credentials from token.json."""
-    return Credentials.from_authorized_user_file(
-        "token.json",
-        ["https://www.googleapis.com/auth/gmail.send"]
+    """Load Gmail API credentials securely from Streamlit Secrets instead of token.json."""
+    token_info = st.secrets["gmail_token"]
+    creds = Credentials(
+        token=token_info["token"],
+        refresh_token=token_info["refresh_token"],
+        token_uri=token_info["token_uri"],
+        client_id=token_info["client_id"],
+        client_secret=token_info["client_secret"],
+        scopes=token_info["scopes"],
     )
+    return creds
+
 
 def create_message(sender, to, subject, body_text):
     """Create a raw base64-encoded email message."""
-    from email.mime.text import MIMEText
-    import base64
     message = MIMEText(body_text)
     message["to"] = to
     message["from"] = sender
@@ -36,10 +42,12 @@ def create_message(sender, to, subject, body_text):
     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
     return {"raw": raw_message}
 
+
 def send_message(service, user_id, message):
     """Send an email message via Gmail API."""
     message = service.users().messages().send(userId=user_id, body=message).execute()
     return f"✅ Email sent successfully! Message ID: {message['id']}"
+
 
 @tool
 def send_email_tool(to: str, subject: str, body: str) -> str:
@@ -51,7 +59,7 @@ def send_email_tool(to: str, subject: str, body: str) -> str:
         body: Email message body
     """
     try:
-        creds = get_credentials()
+        creds = get_credentials()  # now loads from st.secrets
         service = build("gmail", "v1", credentials=creds)
         message = create_message("ts4044903@gmail.com", to, subject, body)
         result = send_message(service, "me", message)
