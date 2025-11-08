@@ -5,6 +5,8 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph_supervisor import create_supervisor
 import os
+from email.mime.text import MIMEText
+import base64
 from langchain_core.tools import tool
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
