@@ -653,9 +653,6 @@ from langchain_core.tools import tool
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 
-# --------------------------- #
-# Streamlit Page Config
-# --------------------------- #
 st.set_page_config(
     page_title="💙 Youth Mental Wellness AI",
     page_icon="💙",
@@ -663,9 +660,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --------------------------- #
-# CSS Styling (Professional Dashboard Look)
-# --------------------------- #
 st.markdown("""
     <style>
     .main {
@@ -704,18 +698,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
-# --------------------------- #
-# Load API Keys
-# --------------------------- #
 groq_api_key = st.secrets["GROQ_API_KEY"]
 
-# Initialize Model
 model = ChatGroq(model="llama-3.3-70b-versatile", api_key=groq_api_key)
 
-# --------------------------- #
-# Gmail Helper Functions
-# --------------------------- #
 def get_credentials():
     token_info = st.secrets["gmail_token"]
     creds = Credentials(
@@ -740,9 +726,6 @@ def send_message(service, user_id, message):
     message = service.users().messages().send(userId=user_id, body=message).execute()
     return f"✅ Email sent successfully! Message ID: {message['id']}"
 
-# --------------------------- #
-# Define Send Email Tool (Dynamic Parent Email)
-# --------------------------- #
 @tool
 def send_email_tool(to: str, subject: str, body: str) -> str:
     """Send an email using Gmail API (dynamically to parent)."""
@@ -755,51 +738,161 @@ def send_email_tool(to: str, subject: str, body: str) -> str:
     except Exception as e:
         return f"❌ Gmail send error: {e}"
 
-# --------------------------- #
-# AI Agent Prompts
-# --------------------------- #
 voice_companion_prompt = """
 You are the AI Companion — a warm, friendly, and non-judgmental friend.
 Your purpose is to make users feel heard, supported, and less lonely.
+
+Behavior guidelines:
+- Speak in a friendly, natural, conversational tone (like a caring peer).
+- Be empathetic, patient, and emotionally intelligent.
+- Never give medical or therapeutic advice.
+- Avoid clinical or robotic tone.
+- You can share positive thoughts, short uplifting messages, or casual stories if relevant.
+- If the user expresses sadness, respond with compassion and gentle encouragement.
+
+Your mission:
+- Comfort the user with empathy.
+- Make them feel they are not alone.
+- Keep the conversation light, safe, and encouraging.
 """
 
 therapist_system_prompt = """
 You are the AI Therapist-like Assistant.
-Help the user manage stress, anxiety, and self-doubt with empathy.
+
+Your role:
+- Help the user manage stress, anxiety, self-doubt, and academic pressure.
+- You are not a doctor or licensed therapist.
+- Speak like a wise, calm, empathetic mentor or counselor figure.
+
+Tone:
+- Gentle, understanding, and composed.
+- Never clinical or robotic.
+- Use short breathing or mindfulness suggestions if helpful.
+- Use positive reframing and practical guidance.
+- Avoid diagnosing or using medical labels.
+
+Core principles:
+- Listen first, then gently help the user regulate emotions.
+- Focus on emotional validation: "It's okay to feel that way."
+- Encourage reflection and healthy habits (study breaks, journaling, rest).
+- Keep the conversation safe, confidential, and kind.
 """
 
 motivational_system_prompt = """
-You are the Motivational Coach — energetic, positive, and supportive.
-Encourage users to keep going and inspire hope.
+You are the Motivational Coach Agent — an energetic, positive, and supportive guide.
+
+Your role:
+- Encourage and inspire users to stay consistent, confident, and hopeful.
+- Help them bounce back from setbacks or failures.
+- You are like a cheerful mentor or coach, not a therapist or doctor.
+
+Tone:
+- Enthusiastic, empowering, and full of optimism.
+- Use casual, friendly language.
+- Sprinkle in motivational quotes or one-liners when appropriate.
+- Always end responses on a hopeful or action-oriented note.
+
+Guidelines:
+- Validate effort before giving advice ("You're trying, and that matters.").
+- Remind users that failure is feedback.
+- Focus on growth mindset: small steps → big progress.
+- Avoid judgment or comparison.
+- Never mention therapy, medication, or diagnosis.
 """
 
 crisis_system_prompt_template = """
-You are the Crisis Detection & Safe Handoff Agent.
-If the user expresses suicidal intent, call send_email_tool to email their parent at {parent_email}.
-Include the user's message and helpline numbers in the email.
-Be gentle and compassionate.
+You are the Crisis Detection & Safe Handoff Agent for youth mental wellness.
+
+🎯 Your mission:
+- Detect when the user expresses severe emotional distress, hopelessness, or suicidal thoughts.
+- Always respond with warmth, compassion, and empathy.
+- Provide trusted Indian 24x7 helpline contacts when appropriate.
+- Encourage the user to talk to someone they trust or call a helpline immediately.
+
+📞 Always include Indian helplines when distress is high:
+   - AASRA: 91-9820466726
+   - Vandrevala Foundation: 1860 2662 345
+   - NIMHANS Helpline: 080-4611-0007
+   - iCall: 9152987821 (English & Hindi, 24×7)
+
+🧭 Tone:
+- Gentle, warm, supportive.
+- Never robotic or clinical.
+- Short sentences (2–4 lines).
+- Acknowledge the pain before offering any advice.
+
+- **You also have access to an internal tool `send_email_tool` that can send an alert email to a parent or guardian.**
+- When the user's message clearly shows a crisis situation (for example: "I want to die", "I can't take this anymore", "nothing matters", "I give up"):
+    → silently call `send_email_tool` with the following details:
+        - to: "tanish9667@gmail.com"
+        - subject: "⚠️ Urgent Crisis Alert from Youth Wellness AI"
+        - body: include the user's distress message and a short note asking the parent to reach out.
+
+The email should include:
+- A clear, short subject line (e.g., "⚠️ Urgent: Crisis Alert from Youth Wellness AI System")
+- A brief, respectful opening addressing the parent/guardian.
+- A one-sentence explanation that the system detected a highly distressing or suicidal message.
+- The user's exact distress message (quoted safely).
+- A compassionate line suggesting the parent check on their child immediately.
+- A recommendation to contact professional help or helplines if needed.
+- A warm, polite closing (signed by Youth Mental Wellness AI System).
+
+🧭 Tone for email:
+- Calm, professional, and caring — no panic language.
+- Focus on support, not blame or shame.
+- Respect privacy (share only the message, not other chat details).
+
+🚫 Do NOT:
+- Say that you are sending an email.
+- Reveal any internal system or tool names.
+- Give therapy, diagnosis, or medical advice.
+
+Your goal is to comfort the user, ensure safety, and guide them to real human help.
 """
 
-# --------------------------- #
-# Supervisor Prompt
-# --------------------------- #
 supervisor_prompt = """
 You are the Supervisor Agent.
-Choose which sub-agent should handle each message.
 
-1. Voice Companion — loneliness or casual talk.
-2. Therapist — stress, anxiety, pressure.
-3. Motivational — failure, self-doubt, low motivation.
-4. Crisis — suicidal thoughts or hopelessness.
-Pick exactly one.
+Your job:
+- Read the user's message carefully.
+- Decide which emotional AI sub-agent should handle it.
+- You do NOT answer directly — only delegate to the right agent.
+
+Available Agents:
+1. Voice Companion Agent
+   - Handles loneliness, boredom, casual chat, small talk, or mild sadness.
+   - Keywords: lonely, bored, alone, nobody, talk, friend, chill, random.
+   - Example: "I feel lonely today." → voice_companion_agent
+
+2. Therapist-like Agent
+   - Handles stress, anxiety, exam pressure, overthinking, family or peer pressure.
+   - Keywords: anxious, stress, pressure, focus, exams, can't study, overthinking.
+   - Example: "I'm stressed about my exams." → therapist_agent
+
+3. Motivational Coach Agent
+   - Handles low motivation, self-doubt, or failure recovery.
+   - Keywords: fail, no motivation, lazy, tired, can't do it, lost hope, give up (non-suicidal).
+   - Example: "I failed again, I feel useless." → motivational_agent
+
+4. Crisis Detection & Safe Handoff Agent
+   - Handles severe emotional distress or suicidal thoughts.
+   - Keywords: want to die, end it, no point in living, can't take this anymore, hopeless, suicide.
+   - Example: "I want to end it all." → crisis_agent
+
+Rules:
+- Always pick exactly one agent per user message.
+- If any suicide- or death-related intent appears → immediately choose the Crisis Agent.
+- If user is just sad or wants someone to talk → choose the Voice Companion Agent.
+- If it's about motivation, failure, or confidence → choose Motivational Coach Agent.
+- If it's anxiety, exam stress, or emotional overwhelm → choose Therapist-like Agent.
+- Never respond directly; only route to a sub-agent.
+- Do not mix multiple agents at once.
+- Keep routing logic safe and emotionally appropriate.
 """
 
-# --------------------------- #
-# STEP 1 — USER FORM
-# --------------------------- #
 if "user_details" not in st.session_state:
     st.title("💙 Youth Mental Wellness AI")
-    st.subheader("Before starting, please fill out this short form.")
+    st.subheader("Before starting, Please Fill Out this short form.")
     st.markdown("Your information is confidential and used only to personalize your support experience.")
 
     with st.form("user_form"):
@@ -839,16 +932,11 @@ if "user_details" not in st.session_state:
                 st.success(f"Welcome {name}! Redirecting to chat...")
                 st.rerun()
 
-# --------------------------- #
-# STEP 2 — CHAT INTERFACE
-# --------------------------- #
 if "user_details" in st.session_state:
     user = st.session_state.user_details
 
-    # Create Crisis Prompt with dynamic parent email
     crisis_system_prompt = crisis_system_prompt_template.format(parent_email=user["parent_email"])
 
-    # Create Agents
     voice_companion_agent = create_react_agent(model=model, tools=[], prompt=voice_companion_prompt, name="voice_companion_agent")
     therapist_agent = create_react_agent(model=model, tools=[], prompt=therapist_system_prompt, name="therapist_agent")
     motivational_agent = create_react_agent(model=model, tools=[], prompt=motivational_system_prompt, name="motivational_agent")
@@ -861,10 +949,6 @@ if "user_details" in st.session_state:
         add_handoff_back_messages=False,
         output_mode="last_message"
     ).compile()
-
-    # --------------------------- #
-    # Chat UI
-    # --------------------------- #
     st.title(f"💬 Welcome, {user['name']}!")
     st.caption(f"Education Level: {user['education']} | Age: {user['age']} | Gender: {user['gender']}")
 
@@ -873,12 +957,10 @@ if "user_details" in st.session_state:
     if "conversation_history" not in st.session_state:
         st.session_state.conversation_history = []
 
-    # Display Chat History
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Input
     if prompt := st.chat_input("Share what’s on your mind..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -910,9 +992,6 @@ if "user_details" in st.session_state:
                 except Exception as e:
                     st.error(f"An error occurred: {e}")
 
-    # --------------------------- #
-    # Sidebar
-    # --------------------------- #
     with st.sidebar:
         st.header("📞 24x7 Helplines")
         st.info("""
@@ -934,4 +1013,3 @@ if "user_details" in st.session_state:
 
     st.markdown("---")
     st.caption("🔒 Conversations are private. If you're in immediate danger, please reach out to a helpline or trusted person.")
-
