@@ -669,15 +669,29 @@ st.set_page_config(
 st.markdown("""
     <style>
     .main {
-        background-color: #f7faff;
+        background-color: #0e1117;
         padding: 2rem;
         border-radius: 15px;
+        color: #f1f1f1;
     }
     .stForm {
-        background: white;
+        background: #1a1d24;
         padding: 2rem;
         border-radius: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 0 15px rgba(0,0,0,0.6);
+        color: #f1f1f1;
+    }
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div > select,
+    .stTextArea > div > div > textarea {
+        background-color: #23272f !important;
+        color: #f1f1f1 !important;
+        border: 1px solid #3a3f47 !important;
+        border-radius: 10px !important;
+    }
+    .stCheckbox > div {
+        color: #f1f1f1 !important;
     }
     .stButton button {
         background-color: #4b9be5 !important;
@@ -687,14 +701,9 @@ st.markdown("""
         width: 100%;
         height: 3rem;
     }
-    .stTextInput>div>div>input {
-        border-radius: 10px;
-    }
-    .stSelectbox>div>div>select {
-        border-radius: 10px;
-    }
     </style>
 """, unsafe_allow_html=True)
+
 
 # --------------------------- #
 # Load API Keys
