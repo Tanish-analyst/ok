@@ -56,7 +56,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 groq_api_key = st.secrets["GROQ_API_KEY"]
-
+langchain_tracing = st.secrets["LANGCHAIN_TRACING_V2"] 
+langsmith_project = st.secrets["LANGSMITH_PROJECT"] 
+langsmith_api_key = st.secrets["LANGSMITH_API_KEY"]
 model = ChatGroq(model="llama-3.3-70b-versatile", api_key=groq_api_key)
 
 def get_credentials():
