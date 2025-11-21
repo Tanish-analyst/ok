@@ -90,13 +90,12 @@ st.markdown("""
     }
 
     /* --- BUTTONS (Start Chat) --- */
-    .stButton button {
-        background-color: #005bff !important;
-        color: white !important;
-        border-radius: 6px !important;
-        padding: 8px 16px !important;
-        border: none !important;
-    }
+   .stButton button {
+    background-color: #005bff !important;   /* Blue */
+    color: white !important;
+    border-radius: 6px !important;
+    border: none !important;
+}
 
     .stButton button:hover {
         background-color: #0040c9 !important;
