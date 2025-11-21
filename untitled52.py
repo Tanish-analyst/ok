@@ -334,7 +334,32 @@ if "user_details" not in st.session_state:
 
         agree = st.checkbox("I agree that this app is for emotional support and not medical therapy.")
 
-        submit = st.form_submit_button("Start Chat 💬")
+        start = st.form_submit_button(
+            "",
+            help="Start Chat",
+        )
+        
+        st.markdown("""
+        <style>
+        .start-btn {
+            background-color: #2663ff;
+            color: white !important;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        .start-btn:hover {
+            background-color: #1e4fd1;
+        }
+        </style>
+        
+        <button class="start-btn" onclick="document.querySelector('form').requestSubmit();">
+            Start Chat 💬
+        </button>
+        """, unsafe_allow_html=True)
+
 
         if submit:
             if not all([name, age, gender, personal_email, parent_email, education]) or not agree:
