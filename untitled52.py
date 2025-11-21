@@ -58,33 +58,32 @@ st.set_page_config(
 st.markdown("""
     <style>
 
-    /* Make full app background white */
-    html, body, [class*="stApp"], .stApp {
+    /* Make entire page white */
+    html, body, .stApp {
         background-color: white !important;
         color: black !important;
     }
 
-    /* Chat messages white background */
+    /* Chat messages background */
     .stChatMessage {
         background-color: white !important;
         color: black !important;
     }
 
-    /* Input text box always visible */
-    textarea, input[type="text"] {
+    /* Input box styling */
+    textarea, input[type="text"], input[type="email"], input[type="number"] {
         background-color: white !important;
         color: black !important;
+        border: 1px solid #d3d3d3 !important;
     }
 
-    /* Prevent typed text disappearing */
-    .stTextInput > div > div > input {
-        background-color: white !important;
-        color: black !important;
-    }
-
-    /* Chat input box white */
+    /* Chat input */
     .stChatInputContainer {
         background-color: white !important;
+    }
+
+    /* FIX FOR LABELS (Full Name, Email, Age) */
+    label, .stMarkdown, .stTextInput label, .css-16idsys p {
         color: black !important;
     }
 
@@ -94,13 +93,14 @@ st.markdown("""
         color: black !important;
     }
 
-    /* Remove dark shadows / dark patches */
+    /* Header white */
     [data-testid="stHeader"] {
         background-color: white !important;
     }
 
     </style>
 """, unsafe_allow_html=True)
+
 
 
 groq_api_key = st.secrets["GROQ_API_KEY"]
