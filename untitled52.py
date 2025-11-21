@@ -338,7 +338,7 @@ if "user_details" not in st.session_state:
 
 
 
-        if submit:
+        if start:
             if not all([name, age, gender, personal_email, parent_email, education]) or not agree:
                 st.error("⚠️ Please fill in all details and accept the terms before proceeding.")
             else:
