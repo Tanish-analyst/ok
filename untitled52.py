@@ -56,34 +56,55 @@ st.set_page_config(
 # """, unsafe_allow_html=True)
 
 st.markdown("""
-    <style>
+<style>
 
-    /* Make entire page white */
+    /* --- GLOBAL THEME --- */
     html, body, .stApp {
         background-color: white !important;
         color: black !important;
     }
 
-    /* Chat messages background */
-    .stChatMessage {
+    /* --- LABELS (Fix invisible field names) --- */
+    label, .stTextInput label, .stSelectbox label, .stNumberInput label {
+        color: black !important;
+        font-weight: 600 !important;
+    }
+
+    /* --- INPUT BOXES (text/email/number) --- */
+    input, textarea {
         background-color: white !important;
+        color: black !important;
+        border: 1px solid #cfcfcf !important;
+    }
+
+    /* --- SELECT BOXES (Gender, Education Level) --- */
+    div[data-baseweb="select"] > div {
+        background-color: white !important;
+        color: black !important;
+        border: 1px solid #cfcfcf !important;
+    }
+
+    /* Dropdown menu text */
+    div[data-baseweb="select"] span {
         color: black !important;
     }
 
-    /* Input box styling */
-    textarea, input[type="text"], input[type="email"], input[type="number"] {
-        background-color: white !important;
-        color: black !important;
-        border: 1px solid #d3d3d3 !important;
+    /* --- BUTTONS (Start Chat) --- */
+    .stButton button {
+        background-color: #005bff !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        border: none !important;
     }
 
-    /* Chat input */
-    .stChatInputContainer {
-        background-color: white !important;
+    .stButton button:hover {
+        background-color: #0040c9 !important;
+        color: white !important;
     }
 
-    /* FIX FOR LABELS (Full Name, Email, Age) */
-    label, .stMarkdown, .stTextInput label, .css-16idsys p {
+    /* --- CHECKBOX LABELS --- */
+    .stCheckbox label {
         color: black !important;
     }
 
@@ -93,13 +114,9 @@ st.markdown("""
         color: black !important;
     }
 
-    /* Header white */
-    [data-testid="stHeader"] {
-        background-color: white !important;
-    }
-
-    </style>
+</style>
 """, unsafe_allow_html=True)
+
 
 
 
