@@ -17,43 +17,91 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# st.markdown("""
+#     <style>
+#     .main {
+#         background-color: #0e1117;
+#         padding: 2rem;
+#         border-radius: 15px;
+#         color: #f1f1f1;
+#     }
+#     .stForm {
+#         background: #1a1d24;
+#         padding: 2rem;
+#         border-radius: 20px;
+#         box-shadow: 0 0 15px rgba(0,0,0,0.6);
+#         color: #f1f1f1;
+#     }
+#     .stTextInput > div > div > input,
+#     .stNumberInput > div > div > input,
+#     .stSelectbox > div > div > select,
+#     .stTextArea > div > div > textarea {
+#         background-color: #23272f !important;
+#         color: #f1f1f1 !important;
+#         border: 1px solid #3a3f47 !important;
+#         border-radius: 10px !important;
+#     }
+#     .stCheckbox > div {
+#         color: #f1f1f1 !important;
+#     }
+#     .stButton button {
+#         background-color: #4b9be5 !important;
+#         color: white !important;
+#         border-radius: 10px !important;
+#         font-weight: 600 !important;
+#         width: 100%;
+#         height: 3rem;
+#     }
+#     </style>
+# """, unsafe_allow_html=True)
+
 st.markdown("""
     <style>
-    .main {
-        background-color: #0e1117;
-        padding: 2rem;
-        border-radius: 15px;
-        color: #f1f1f1;
+
+    /* Make full app background white */
+    html, body, [class*="stApp"], .stApp {
+        background-color: white !important;
+        color: black !important;
     }
-    .stForm {
-        background: #1a1d24;
-        padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.6);
-        color: #f1f1f1;
+
+    /* Chat messages white background */
+    .stChatMessage {
+        background-color: white !important;
+        color: black !important;
     }
-    .stTextInput > div > div > input,
-    .stNumberInput > div > div > input,
-    .stSelectbox > div > div > select,
-    .stTextArea > div > div > textarea {
-        background-color: #23272f !important;
-        color: #f1f1f1 !important;
-        border: 1px solid #3a3f47 !important;
-        border-radius: 10px !important;
+
+    /* Input text box always visible */
+    textarea, input[type="text"] {
+        background-color: white !important;
+        color: black !important;
     }
-    .stCheckbox > div {
-        color: #f1f1f1 !important;
+
+    /* Prevent typed text disappearing */
+    .stTextInput > div > div > input {
+        background-color: white !important;
+        color: black !important;
     }
-    .stButton button {
-        background-color: #4b9be5 !important;
-        color: white !important;
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-        width: 100%;
-        height: 3rem;
+
+    /* Chat input box white */
+    .stChatInputContainer {
+        background-color: white !important;
+        color: black !important;
     }
+
+    /* Sidebar white */
+    section[data-testid="stSidebar"] {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    /* Remove dark shadows / dark patches */
+    [data-testid="stHeader"] {
+        background-color: white !important;
+    }
+
     </style>
 """, unsafe_allow_html=True)
+
 
 groq_api_key = st.secrets["GROQ_API_KEY"]
 langchain_tracing = st.secrets["LANGCHAIN_TRACING_V2"] 
