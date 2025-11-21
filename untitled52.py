@@ -17,104 +17,104 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# st.markdown("""
-#     <style>
-#     .main {
-#         background-color: #0e1117;
-#         padding: 2rem;
-#         border-radius: 15px;
-#         color: #f1f1f1;
-#     }
-#     .stForm {
-#         background: #1a1d24;
-#         padding: 2rem;
-#         border-radius: 20px;
-#         box-shadow: 0 0 15px rgba(0,0,0,0.6);
-#         color: #f1f1f1;
-#     }
-#     .stTextInput > div > div > input,
-#     .stNumberInput > div > div > input,
-#     .stSelectbox > div > div > select,
-#     .stTextArea > div > div > textarea {
-#         background-color: #23272f !important;
-#         color: #f1f1f1 !important;
-#         border: 1px solid #3a3f47 !important;
-#         border-radius: 10px !important;
-#     }
-#     .stCheckbox > div {
-#         color: #f1f1f1 !important;
-#     }
-#     .stButton button {
-#         background-color: #4b9be5 !important;
-#         color: white !important;
-#         border-radius: 10px !important;
-#         font-weight: 600 !important;
-#         width: 100%;
-#         height: 3rem;
-#     }
-#     </style>
-# """, unsafe_allow_html=True)
-
 st.markdown("""
-<style>
-
-    /* --- GLOBAL THEME --- */
-    html, body, .stApp {
-        background-color: white !important;
-        color: black !important;
+    <style>
+    .main {
+        background-color: #0e1117;
+        padding: 2rem;
+        border-radius: 15px;
+        color: #f1f1f1;
     }
-
-    /* --- LABELS (Fix invisible field names) --- */
-    label, .stTextInput label, .stSelectbox label, .stNumberInput label {
-        color: black !important;
-        font-weight: 600 !important;
+    .stForm {
+        background: #1a1d24;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.6);
+        color: #f1f1f1;
     }
-
-    /* --- INPUT BOXES (text/email/number) --- */
-    input, textarea {
-        background-color: white !important;
-        color: black !important;
-        border: 1px solid #cfcfcf !important;
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div > select,
+    .stTextArea > div > div > textarea {
+        background-color: #23272f !important;
+        color: #f1f1f1 !important;
+        border: 1px solid #3a3f47 !important;
+        border-radius: 10px !important;
     }
-
-    /* --- SELECT BOXES (Gender, Education Level) --- */
-    div[data-baseweb="select"] > div {
-        background-color: white !important;
-        color: black !important;
-        border: 1px solid #cfcfcf !important;
+    .stCheckbox > div {
+        color: #f1f1f1 !important;
     }
-
-    /* Dropdown menu text */
-    div[data-baseweb="select"] span {
-        color: black !important;
-    }
-
-    /* --- BUTTONS (Start Chat) --- */
-   .stButton button {
-    background-color: #005bff !important;   /* Blue */
-    color: white !important;
-    border-radius: 6px !important;
-    border: none !important;
-}
-
-    .stButton button:hover {
-        background-color: #0040c9 !important;
+    .stButton button {
+        background-color: #4b9be5 !important;
         color: white !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        width: 100%;
+        height: 3rem;
     }
-
-    /* --- CHECKBOX LABELS --- */
-    .stCheckbox label {
-        color: black !important;
-    }
-
-    /* Sidebar white */
-    section[data-testid="stSidebar"] {
-        background-color: white !important;
-        color: black !important;
-    }
-
-</style>
+    </style>
 """, unsafe_allow_html=True)
+
+# st.markdown("""
+# <style>
+
+#     /* --- GLOBAL THEME --- */
+#     html, body, .stApp {
+#         background-color: white !important;
+#         color: black !important;
+#     }
+
+#     /* --- LABELS (Fix invisible field names) --- */
+#     label, .stTextInput label, .stSelectbox label, .stNumberInput label {
+#         color: black !important;
+#         font-weight: 600 !important;
+#     }
+
+#     /* --- INPUT BOXES (text/email/number) --- */
+#     input, textarea {
+#         background-color: white !important;
+#         color: black !important;
+#         border: 1px solid #cfcfcf !important;
+#     }
+
+#     /* --- SELECT BOXES (Gender, Education Level) --- */
+#     div[data-baseweb="select"] > div {
+#         background-color: white !important;
+#         color: black !important;
+#         border: 1px solid #cfcfcf !important;
+#     }
+
+#     /* Dropdown menu text */
+#     div[data-baseweb="select"] span {
+#         color: black !important;
+#     }
+
+#     /* --- BUTTONS (Start Chat) --- */
+#    .stButton button {
+#     background-color: #005bff !important;   /* Blue */
+#     color: white !important;
+#     border-radius: 6px !important;
+#     border: none !important;
+# }
+
+#     .stButton button:hover {
+#         background-color: #0040c9 !important;
+#         color: white !important;
+#     }
+
+#     /* --- CHECKBOX LABELS --- */
+#     .stCheckbox label {
+#         color: black !important;
+#     }
+
+#     /* Sidebar white */
+#     section[data-testid="stSidebar"] {
+#         background-color: white !important;
+#         color: black !important;
+#     }
+
+# </style>
+# """, unsafe_allow_html=True)
 
 
 
