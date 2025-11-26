@@ -55,68 +55,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# st.markdown("""
-# <style>
-
-#     /* --- GLOBAL THEME --- */
-#     html, body, .stApp {
-#         background-color: white !important;
-#         color: black !important;
-#     }
-
-#     /* --- LABELS (Fix invisible field names) --- */
-#     label, .stTextInput label, .stSelectbox label, .stNumberInput label {
-#         color: black !important;
-#         font-weight: 600 !important;
-#     }
-
-#     /* --- INPUT BOXES (text/email/number) --- */
-#     input, textarea {
-#         background-color: white !important;
-#         color: black !important;
-#         border: 1px solid #cfcfcf !important;
-#     }
-
-#     /* --- SELECT BOXES (Gender, Education Level) --- */
-#     div[data-baseweb="select"] > div {
-#         background-color: white !important;
-#         color: black !important;
-#         border: 1px solid #cfcfcf !important;
-#     }
-
-#     /* Dropdown menu text */
-#     div[data-baseweb="select"] span {
-#         color: black !important;
-#     }
-
-#     /* --- BUTTONS (Start Chat) --- */
-#    .stButton button {
-#     background-color: #005bff !important;   /* Blue */
-#     color: white !important;
-#     border-radius: 6px !important;
-#     border: none !important;
-# }
-
-#     .stButton button:hover {
-#         background-color: #0040c9 !important;
-#         color: white !important;
-#     }
-
-#     /* --- CHECKBOX LABELS --- */
-#     .stCheckbox label {
-#         color: black !important;
-#     }
-
-#     /* Sidebar white */
-#     section[data-testid="stSidebar"] {
-#         background-color: white !important;
-#         color: black !important;
-#     }
-
-# </style>
-# """, unsafe_allow_html=True)
-
-
 
 
 groq_api_key = st.secrets["GROQ_API_KEY"]
